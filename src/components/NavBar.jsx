@@ -237,7 +237,7 @@ const NavBar = (props) => {
 
       <header className="relative bg-brown-sx">
         <p className="flex h-10 items-center justify-center bg-gradient-to-r from-brown-s via-brown-lg to-brown-xl px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
-          Envios Internacionales
+          Envíos Internacionales
         </p>
 
         <nav

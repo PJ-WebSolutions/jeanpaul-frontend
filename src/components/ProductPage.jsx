@@ -13,32 +13,51 @@
   }
   ```
 */
-import { useState, useEffect, useContext, Fragment } from 'react'
-import axios from 'axios'
-import { Disclosure, RadioGroup, Tab, Menu, Transition } from '@headlessui/react'
-import { StarIcon, ChevronDownIcon } from '@heroicons/react/20/solid'
-import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
-import { useParams } from 'react-router-dom'
-import ShoeContext from '../context/ShoeContext'
+import {
+  Disclosure,
+  Menu,
+  RadioGroup,
+  Tab,
+  Transition,
+} from "@headlessui/react";
+import { ChevronDownIcon, StarIcon } from "@heroicons/react/20/solid";
+import { HeartIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { Fragment, useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import ShoeContext from "../context/ShoeContext";
 
 const product = {
-  name: 'Zip Tote Basket',
-  price: '$140',
+  name: "Zip Tote Basket",
+  price: "$140",
   rating: 4,
   images: [
     {
       id: 1,
-      name: 'Angled view',
-      src: 'https://tailwindui.com/img/ecommerce-images/product-page-03-product-01.jpg',
-      alt: 'Angled front view with bag zipped and handles upright.',
+      name: "Angled view",
+      src: "https://tailwindui.com/img/ecommerce-images/product-page-03-product-01.jpg",
+      alt: "Angled front view with bag zipped and handles upright.",
     },
     // More images...
   ],
   colors: [
-    { name: 'Washed Black', bgColor: 'bg-gray-700', selectedColor: 'ring-gray-700' },
-    { name: 'White', bgColor: 'bg-white', selectedColor: 'ring-gray-400' },
-    { name: 'Washed Gray', bgColor: 'bg-gray-500', selectedColor: 'ring-gray-500' },
-    { name: 'Washed Gray', bgColor: 'bg-gray-500', selectedColor: 'ring-gray-500', size: '6'},
+    {
+      name: "Washed Black",
+      bgColor: "bg-gray-700",
+      selectedColor: "ring-gray-700",
+    },
+    { name: "White", bgColor: "bg-white", selectedColor: "ring-gray-400" },
+    {
+      name: "Washed Gray",
+      bgColor: "bg-gray-500",
+      selectedColor: "ring-gray-500",
+    },
+    {
+      name: "Washed Gray",
+      bgColor: "bg-gray-500",
+      selectedColor: "ring-gray-500",
+      size: "6",
+    },
   ],
   description: `
     <p>The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.</p>
@@ -46,17 +65,18 @@ const product = {
   details: [
     // // More sections...
   ],
-}
+};
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 const ProductPage = (props) => {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0])
+  // colors,
+  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [item, setItem] = useState({});
   const [sizes, setSizes] = useState([]);
-  const [shoeSize, setShoeSize] = useState('');
+  const [shoeSize, setShoeSize] = useState("");
   const { id } = useParams();
   const itemsInCart = useContext(ShoeContext).itemsInCart;
   const setItemsInCart = useContext(ShoeContext).setItemsInCart;
@@ -64,47 +84,61 @@ const ProductPage = (props) => {
   const setNumInCart = useContext(ShoeContext).setNumInCart;
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/shoe/' + id)
-      .then(res => {
+    axios
+      .get("http://localhost:8000/api/shoe/" + id)
+      .then((res) => {
         console.log(res.data.imgUrls);
-        setItem({...res.data, quantity: 1, size: res.data.size[0]});
+        setItem({ ...res.data, quantity: 1, size: res.data.size[0] });
         setSizes([...res.data.size]);
         setShoeSize(res.data.size[0]);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [id]);
 
   const addToCart = (e) => {
     e.preventDefault();
-    let currentProducts = JSON.parse(sessionStorage.getItem('itemsInCart'));
+    let currentProducts = JSON.parse(sessionStorage.getItem("itemsInCart"));
 
-    if(currentProducts !== null){
-      for(let i in currentProducts){
-        if(Object.values(currentProducts[i]).includes(item._id) && Object.values(currentProducts[i]).includes(item.size)){
+    if (currentProducts !== null) {
+      for (let i in currentProducts) {
+        if (
+          Object.values(currentProducts[i]).includes(item._id) &&
+          Object.values(currentProducts[i]).includes(item.size)
+        ) {
           currentProducts[i].quantity++;
-          sessionStorage.setItem('itemsInCart', JSON.stringify([...currentProducts]));
-          sessionStorage.setItem('numInCart', numInCart + 1);
-          const updateItemsInCart = JSON.parse(sessionStorage.getItem('itemsInCart'));
+          sessionStorage.setItem(
+            "itemsInCart",
+            JSON.stringify([...currentProducts])
+          );
+          sessionStorage.setItem("numInCart", numInCart + 1);
+          const updateItemsInCart = JSON.parse(
+            sessionStorage.getItem("itemsInCart")
+          );
           setItemsInCart(updateItemsInCart);
           setNumInCart(sessionStorage.numInCart);
           return;
         }
       }
-      sessionStorage.setItem('itemsInCart', JSON.stringify([...currentProducts, item]));
-      sessionStorage.setItem('numInCart', numInCart + 1);
-      const updateItemsInCart = JSON.parse(sessionStorage.getItem('itemsInCart'));
+      sessionStorage.setItem(
+        "itemsInCart",
+        JSON.stringify([...currentProducts, item])
+      );
+      sessionStorage.setItem("numInCart", numInCart + 1);
+      const updateItemsInCart = JSON.parse(
+        sessionStorage.getItem("itemsInCart")
+      );
       setItemsInCart(updateItemsInCart);
     } else {
-      sessionStorage.setItem('itemsInCart', JSON.stringify([item]));
+      sessionStorage.setItem("itemsInCart", JSON.stringify([item]));
       sessionStorage.numInCart = 1;
     }
     setNumInCart(sessionStorage.numInCart);
-  }
+  };
 
   const sizeHandler = (e) => {
     setShoeSize(e.target.id);
-    setItem({...item, size: e.target.id})
-  }
+    setItem({ ...item, size: e.target.id });
+  };
 
   return (
     <div className="bg-white lg:h-screen">
@@ -124,20 +158,24 @@ const ProductPage = (props) => {
                       <>
                         <span className="sr-only"> {image} </span>
                         <span className="absolute inset-0 overflow-hidden rounded-md">
-                          <img src={image} alt="" className="h-full w-full object-cover object-center" />
+                          <img
+                            src={image}
+                            alt=""
+                            className="h-full w-full object-cover object-center"
+                          />
                         </span>
                         <span
                           className={classNames(
-                            selected ? 'ring-green' : 'ring-transparent',
-                            'pointer-events-none absolute inset-0 rounded-md ring-2 ring-offset-2'
+                            selected ? "ring-green" : "ring-transparent",
+                            "pointer-events-none absolute inset-0 rounded-md ring-2 ring-offset-2"
                           )}
                           aria-hidden="true"
                         />
                       </>
                     )}
                   </Tab>
-                ))} 
-              </Tab.List> 
+                ))}
+              </Tab.List>
             </div>
 
             <Tab.Panels className="aspect-w-1 aspect-h-1 w-full">
@@ -155,12 +193,22 @@ const ProductPage = (props) => {
 
           {/* Product info */}
           <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-            {item.categories ? <h4 className='text-green tracking-tight'>{item.categories[0]}</h4> : <p></p>}
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{item.name}</h1>
+            {item.categories ? (
+              <h4 className="text-green tracking-tight">
+                {item.categories[0]}
+              </h4>
+            ) : (
+              <p></p>
+            )}
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              {item.name}
+            </h1>
 
             <div className="mt-3">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl tracking-tight text-gray-900">${item.price}</p>
+              <p className="text-3xl tracking-tight text-gray-900">
+                ${item.price}
+              </p>
             </div>
 
             <div className="mt-6">
@@ -173,39 +221,44 @@ const ProductPage = (props) => {
             </div>
 
             <form className="mt-6">
-              <div className='flex items-center gap-3'>
-                <h2 className='font-medium'>Size:</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="font-medium">Size:</h2>
                 <Menu as="div" className="relative inline-block text-left">
-                      <div>
-                          <Menu.Button className="group inline-flex justify-center items-center text-md font-medium text-gray-700 hover:text-gray-900">
-                              {shoeSize}
-                              <ChevronDownIcon
-                                  className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-green"
-                                  aria-hidden="true"
-                              />
-                          </Menu.Button>
-                      </div>
+                  <div>
+                    <Menu.Button className="group inline-flex justify-center items-center text-md font-medium text-gray-700 hover:text-gray-900">
+                      {shoeSize}
+                      <ChevronDownIcon
+                        className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-green"
+                        aria-hidden="true"
+                      />
+                    </Menu.Button>
+                  </div>
 
-                      <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-100"
-                          enterFrom="transform opacity-0 scale-95"
-                          enterTo="transform opacity-100 scale-100"
-                          leave="transition ease-in duration-75"
-                          leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95"
-                      >
-                          <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <div className="py-1">
-                                {sizes?.map((size, sizeIdx) => (
-                                  <Menu.Item key={size + sizeIdx} id={size}>
-                                      <p onClick={(e) => sizeHandler(e)} className='block px-4 py-2 text-sm cursor-pointer hover:bg-light-blue hover:text-white'>{size}</p>
-                                  </Menu.Item>
-                                ))}
-                              </div>
-                          </Menu.Items>
-                      </Transition>
-                  </Menu>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="py-1">
+                        {sizes?.map((size, sizeIdx) => (
+                          <Menu.Item key={size + sizeIdx} id={size}>
+                            <p
+                              onClick={(e) => sizeHandler(e)}
+                              className="block px-4 py-2 text-sm cursor-pointer hover:bg-light-blue hover:text-white"
+                            >
+                              {size}
+                            </p>
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
               </div>
 
               <div className="sm:flex-col1 mt-10 flex">
@@ -232,7 +285,10 @@ const ProductPage = (props) => {
                         <h3>
                           <Disclosure.Button className="group relative flex w-full items-center justify-between py-6 text-left">
                             <span
-                              className={classNames(open ? 'text-dark-blue' : 'text-gray-900', 'text-sm font-medium')}
+                              className={classNames(
+                                open ? "text-dark-blue" : "text-gray-900",
+                                "text-sm font-medium"
+                              )}
                             >
                               {detail.name}
                             </span>
@@ -251,7 +307,10 @@ const ProductPage = (props) => {
                             </span>
                           </Disclosure.Button>
                         </h3>
-                        <Disclosure.Panel as="div" className="prose prose-sm pb-6">
+                        <Disclosure.Panel
+                          as="div"
+                          className="prose prose-sm pb-6"
+                        >
                           <ul role="list">
                             {detail.items.map((item) => (
                               <li key={item}>{item}</li>
@@ -268,7 +327,7 @@ const ProductPage = (props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ProductPage;
